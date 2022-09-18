@@ -28,7 +28,7 @@ describe('Create user controller', () => {
     expect(response.status).toBe(201);
   });
 
-  it('should be able to create a new user that already exists', async () => {
+  it('should not be able to create a new user that already exists', async () => {
     const response = await request(app).post(baseUrl).send({
       email: 'test@email.com',
       name: 'test',
