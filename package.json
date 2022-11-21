@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "JWT_SECRET=askji34879823f ts-node-dev --transpile-only --ignore-watch node_modules --respawn ./src/server.ts",
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli",
-    "test": "JWT_SECRET=askji34879823f NODE_ENV=test jest --detectOpenHandles"
+    "test": "JWT_SECRET=askji34879823f NODE_ENV=test jest --detectOpenHandles --runInBand"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

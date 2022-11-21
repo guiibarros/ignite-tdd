@@ -43,7 +43,23 @@ describe('Get account balance controller', () => {
     })
 
     await request(app).post(`${baseUrl}/statements/withdraw`).send({
-      amount: 75,
+      amount: 50,
+      description: 'test withdraw',
+    }).set({
+      authorization: `Bearer ${token}`,
+    })
+
+    // Create receiver user
+    const receiverResponse = await request(app).post(`${baseUrl}/users`).send({
+      email: 'receiver@email.com',
+      name: 'receiver',
+      password: 'receiver',
+    });
+
+    const receiver_id = receiverResponse.body.id
+
+    await request(app).post(`${baseUrl}/statements/transfer/${receiver_id}`).send({
+      amount: 50,
       description: 'test withdraw',
     }).set({
       authorization: `Bearer ${token}`,
@@ -54,8 +70,8 @@ describe('Get account balance controller', () => {
     });
 
     expect(response.status).toBe(200);
-    expect(response.body.statement.length).toBe(2);
-    expect(response.body.balance).toEqual(125);
+    expect(response.body.statement.length).toBe(3);
+    expect(response.body.balance).toEqual(100);
   });
 
   it('should not be able to get an accout balance with invalid token', async () => {
