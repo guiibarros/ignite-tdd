@@ -64,7 +64,7 @@ describe('Get account statement operation', () => {
     }).rejects.toBeInstanceOf(GetStatementOperationError.UserNotFound);
   });
 
-  it('should not be able to get an inexistent statement operation form an account', async () => {
+  it('should not be able to get an inexistent statement operation from an account', async () => {
     await expect(async () => {
       const { id } = await createUserUseCase.execute({
         email: 'test@email.com',

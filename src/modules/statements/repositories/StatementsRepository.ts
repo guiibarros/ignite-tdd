@@ -44,7 +44,13 @@ export class StatementsRepository implements IStatementsRepository {
       where: { user_id }
     });
 
-    const balance = statement.reduce((acc, operation) => {
+    // Typeorm return amount column as string, because it's decimal numbers. This is a workaround that convert to number
+    const statementsWithParsedAmount = statement.map(statement => ({
+      ...statement,
+      amount: Number(statement.amount)
+    }));
+
+    const balance = statementsWithParsedAmount.reduce((acc, operation) => {
       if (operation.type === 'deposit') {
         return acc + operation.amount;
       } else {
@@ -54,7 +60,7 @@ export class StatementsRepository implements IStatementsRepository {
 
     if (with_statement) {
       return {
-        statement,
+        statement: statementsWithParsedAmount,
         balance
       }
     }
