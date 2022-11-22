@@ -8,6 +8,7 @@ let connection: Connection;
 
 const baseUrl = '/api/v1'
 
+let sender_id: string;
 let receiver_id: string;
 let token: string;
 
@@ -17,12 +18,14 @@ describe('Create a transfer statement controller', () => {
     await connection.runMigrations();
 
     // Create sender and receiver users
-    await request(app).post(`${baseUrl}/users`)
+    const { body: sender } = await request(app).post(`${baseUrl}/users`)
       .send({
         email: 'sender@email.com',
         name: 'sender',
         password: 'sender',
       });
+
+    sender_id = sender.id;
 
     const { body: receiver } = await request(app).post(`${baseUrl}/users`)
       .send({
@@ -64,6 +67,20 @@ describe('Create a transfer statement controller', () => {
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('id');
     expect(response.body.description).toEqual('transfer test');
+  });
+
+  it('should not be able to create a new transfer statement for the sender user', async () => {
+    const response = await request(app)
+      .post(`${baseUrl}/statements/transfer/${sender_id}`)
+      .send({
+        amount: 50,
+        description: 'transfer test',
+      }).set({
+        authorization: `Bearer ${token}`,
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Receiver user should not be the same as sender user');
   });
 
   it('should not be able to create a new transfer statement with invalid token', async () => {

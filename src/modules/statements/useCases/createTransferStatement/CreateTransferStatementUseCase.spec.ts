@@ -1,6 +1,7 @@
 import { InMemoryUsersRepository } from "../../../users/repositories/in-memory/InMemoryUsersRepository";
 import { InMemoryStatementsRepository } from "../../repositories/in-memory/InMemoryStatementsRepository";
 import { CreateStatementError } from "../createStatement/CreateStatementError";
+import { CreateTransferStatementError } from "./CreateTransferStatementError";
 import { CreateTransferStatementUseCase } from "./CreateTransferStatementUseCase";
 
 let inMemoryUsersRepository: InMemoryUsersRepository;
@@ -52,6 +53,23 @@ describe('Create a new transfer statement', () => {
 
     expect(transferStatement).toHaveProperty('id');
     expect(transferStatement.type).toEqual('transfer');
+  });
+
+  it('should not be able to create a new transfer statement for the sender user', async () => {
+    const { id: sender_id } = await inMemoryUsersRepository.create({
+      email: 'sender@email.com',
+      name: 'sender user',
+      password: 'abc123'
+    });
+
+    await expect(
+      createTransferStatementUseCase.execute({
+        amount: 50,
+        description: 'Aluguel da casa',
+        sender_id: String(sender_id),
+        receiver_id: String(sender_id),
+      })
+    ).rejects.toEqual(new CreateTransferStatementError());
   });
 
   it('should not be able to create a new transfer statement with insufficient funds', async () => {

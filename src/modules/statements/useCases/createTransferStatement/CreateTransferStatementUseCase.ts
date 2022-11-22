@@ -3,6 +3,7 @@ import { IUsersRepository } from "../../../users/repositories/IUsersRepository";
 import { Statement } from "../../entities/Statement";
 import { IStatementsRepository } from "../../repositories/IStatementsRepository";
 import { CreateStatementError } from "../createStatement/CreateStatementError";
+import { CreateTransferStatementError } from "./CreateTransferStatementError";
 import { ICreateTransferStatementDTO } from "./ICreateTransferStatementDTO";
 
 enum OperationType {
@@ -33,6 +34,10 @@ export class CreateTransferStatementUseCase {
     }
 
     const receiverUser = await this.usersRepository.findById(receiver_id);
+
+    if (sender_id === receiver_id) {
+      throw new CreateTransferStatementError();
+    }
 
     if (!receiverUser) {
       throw new CreateStatementError.UserNotFound();
